@@ -165,8 +165,17 @@
 
 .loading-indicator {
   color: var(--console-text);
-  animation: pulse 1.5s ease-in-out infinite;
+  animation: loading-pulse 1.5s ease-in-out infinite;
   margin-right: 0.5rem;
+}
+
+@keyframes loading-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
 }
 
 .terminal-entry.loading {

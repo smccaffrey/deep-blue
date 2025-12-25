@@ -118,17 +118,17 @@ const Console = () => {
         return;
       }
       
-      // Stream the output text
-      let streamedContent = '';
-      const outputIndex = history.length + (needsLoading.includes(commandName) ? 2 : 1);
-      
+      // Add empty output entry and stream the text into it
       setHistory(prev => [...prev, { type: 'output', content: '', streaming: true }]);
+      
+      let streamedContent = '';
       
       await streamText(output, (text) => {
         streamedContent = text;
         setHistory(prev => {
           const newHistory = [...prev];
-          newHistory[outputIndex] = { type: 'output', content: text, streaming: true };
+          // Update the last entry which is the output we just added
+          newHistory[newHistory.length - 1] = { type: 'output', content: text, streaming: true };
           return newHistory;
         });
       });
@@ -136,7 +136,7 @@ const Console = () => {
       // Mark streaming as complete
       setHistory(prev => {
         const newHistory = [...prev];
-        newHistory[outputIndex] = { type: 'output', content: streamedContent, streaming: false };
+        newHistory[newHistory.length - 1] = { type: 'output', content: streamedContent, streaming: false };
         return newHistory;
       });
     } else {
