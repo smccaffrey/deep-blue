@@ -142,7 +142,7 @@ export const animations = {
      /     \\
     | O   O |
     |   >   |
-    |  \_/  |
+    |  _/  |
      \\_____/
   `,
   whale2: `
@@ -150,7 +150,7 @@ export const animations = {
      /     \\
     | O   O |
     |   <   |
-    |  \_/  |
+    |  _/  |
      \\_____/
   `,
   whale3: `
@@ -158,7 +158,7 @@ export const animations = {
      /     \\
     | -   - |
     |   >   |
-    |  \_/  |
+    |  _/  |
      \\_____/
   `
 };

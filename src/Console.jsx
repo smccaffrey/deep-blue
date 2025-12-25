@@ -1,18 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import './Console.css';
 import { commandRegistry } from './commands';
-import { whaleAscii, sharkAscii, logoAscii } from './ascii-art';
+import { logoAscii } from './ascii-art';
 
 const Console = () => {
-  const [history, setHistory] = useState([]);
-  const [currentCommand, setCurrentCommand] = useState('');
-  const [commandHistory, setCommandHistory] = useState([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
-  const inputRef = useRef(null);
-  const terminalRef = useRef(null);
-
-  useEffect(() => {
-    // Display welcome message
+  const [history, setHistory] = useState(() => {
+    // Initialize with welcome message
     const welcomeMessage = {
       type: 'output',
       content: [
@@ -30,8 +23,13 @@ const Console = () => {
         ''
       ].join('\n')
     };
-    setHistory([welcomeMessage]);
-  }, []);
+    return [welcomeMessage];
+  });
+  const [currentCommand, setCurrentCommand] = useState('');
+  const [commandHistory, setCommandHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const inputRef = useRef(null);
+  const terminalRef = useRef(null);
 
   useEffect(() => {
     // Auto-scroll to bottom
