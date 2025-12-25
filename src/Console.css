@@ -141,12 +141,17 @@
   font-size: 14px;
   padding: 0;
   caret-color: transparent;
+  margin-left: 2px;
+}
+
+.terminal-input:disabled {
+  opacity: 0.5;
 }
 
 .cursor-blink {
   color: var(--console-text);
   animation: blink 1s step-end infinite;
-  margin-left: 2px;
+  margin-right: 0;
 }
 
 @keyframes blink {
@@ -156,6 +161,17 @@
   51%, 100% {
     opacity: 0;
   }
+}
+
+.loading-indicator {
+  color: var(--console-text);
+  animation: pulse 1.5s ease-in-out infinite;
+  margin-right: 0.5rem;
+}
+
+.terminal-entry.loading {
+  color: var(--warning-color);
+  font-style: italic;
 }
 
 .console-footer {

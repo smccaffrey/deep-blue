@@ -28,6 +28,7 @@ const Console = () => {
   const [currentCommand, setCurrentCommand] = useState('');
   const [commandHistory, setCommandHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
+  const [isProcessing, setIsProcessing] = useState(false);
   const inputRef = useRef(null);
   const terminalRef = useRef(null);
 
@@ -45,7 +46,22 @@ const Console = () => {
     }
   }, []);
 
-  const handleCommand = (cmd) => {
+  const streamText = async (text, callback) => {
+    const lines = text.split('\n');
+    let displayedText = '';
+    
+    for (let i = 0; i < lines.length; i++) {
+      displayedText += (i > 0 ? '\n' : '') + lines[i];
+      callback(displayedText);
+      
+      // Add delay between lines for streaming effect
+      if (i < lines.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 30));
+      }
+    }
+  };
+
+  const handleCommand = async (cmd) => {
     const trimmedCmd = cmd.trim();
     
     // Add command to history display
@@ -54,6 +70,9 @@ const Console = () => {
     if (!trimmedCmd) {
       return;
     }
+
+    // Disable input while processing
+    setIsProcessing(true);
 
     // Add to command history for up/down navigation
     setCommandHistory(prev => [...prev, trimmedCmd]);
@@ -67,21 +86,67 @@ const Console = () => {
     // Execute command
     const command = commandRegistry[commandName];
     if (command) {
+      // Show loading message for commands that need it
+      const needsLoading = ['listen', 'signal', 'research', 'sonar', 'data', 'animate', 'whale', 'shark'];
+      
+      if (needsLoading.includes(commandName)) {
+        // Add loading message
+        const loadingMessages = {
+          listen: 'Initializing hydrophone array...\nConnecting to deep ocean sensors...',
+          signal: 'Analyzing signal patterns...\nProcessing whale communication data...',
+          research: 'Accessing research database...\nRetrieving station data...',
+          sonar: 'Initiating sonar scan...\nAnalyzing marine life signatures...',
+          data: 'Streaming data from ocean sensors...\nDecoding transmission...',
+          animate: 'Loading animation sequence...\nRendering pixel art...',
+          whale: 'Rendering whale visualization...',
+          shark: 'Rendering shark visualization...'
+        };
+        
+        const loadingMsg = loadingMessages[commandName] || 'Processing...';
+        setHistory(prev => [...prev, { type: 'loading', content: loadingMsg }]);
+        
+        // Wait for loading effect
+        await new Promise(resolve => setTimeout(resolve, 800));
+      }
+      
       const output = command.execute(args);
       
       // Special handling for clear command
       if (output === 'CLEAR_SCREEN') {
         setHistory([]);
+        setIsProcessing(false);
         return;
       }
       
-      setHistory(prev => [...prev, { type: 'output', content: output }]);
+      // Stream the output text
+      let streamedContent = '';
+      const outputIndex = history.length + (needsLoading.includes(commandName) ? 2 : 1);
+      
+      setHistory(prev => [...prev, { type: 'output', content: '', streaming: true }]);
+      
+      await streamText(output, (text) => {
+        streamedContent = text;
+        setHistory(prev => {
+          const newHistory = [...prev];
+          newHistory[outputIndex] = { type: 'output', content: text, streaming: true };
+          return newHistory;
+        });
+      });
+      
+      // Mark streaming as complete
+      setHistory(prev => {
+        const newHistory = [...prev];
+        newHistory[outputIndex] = { type: 'output', content: streamedContent, streaming: false };
+        return newHistory;
+      });
     } else {
       setHistory(prev => [...prev, {
         type: 'error',
         content: `Command not found: ${commandName}\nType "help" for available commands.`
       }]);
     }
+    
+    setIsProcessing(false);
   };
 
   const handleKeyDown = (e) => {
@@ -135,12 +200,14 @@ const Console = () => {
         {history.map((entry, index) => (
           <div key={index} className={`terminal-entry ${entry.type}`}>
             {entry.type === 'command' && <span className="prompt">visitor@deepblue:~$ </span>}
+            {entry.type === 'loading' && <span className="loading-indicator">● </span>}
             <pre className="terminal-text">{entry.content}</pre>
           </div>
         ))}
         
         <div className="terminal-input-line">
           <span className="prompt">visitor@deepblue:~$ </span>
+          <span className="cursor-blink">█</span>
           <input
             ref={inputRef}
             type="text"
@@ -150,8 +217,8 @@ const Console = () => {
             onKeyDown={handleKeyDown}
             autoComplete="off"
             spellCheck="false"
+            disabled={isProcessing}
           />
-          <span className="cursor-blink">█</span>
         </div>
       </div>
       
