@@ -57,7 +57,7 @@ Once the site loads, try these commands in the terminal:
 
 ## 🎨 Design Features
 
-- **Color Scheme** - Minimalist black background with bright green terminal text
+- **Color Scheme** - Minimalist black background with cool blueish neon (#00d9ff) terminal text
 - **Typography** - Monospace font (Courier New) for authentic terminal feel
 - **Interactive Elements** - Command history navigation (↑↓ arrows)
 - **Responsive Design** - Works on desktop and mobile devices
